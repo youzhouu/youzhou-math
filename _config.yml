@@ -1,0 +1,78 @@
+# GitHub Pages project site. Change these fields together if the site moves.
+title: "You Zhou"
+description: "You Zhou — undergraduate in Mathematics and Applied Mathematics at Shenzhen University. Interests in partial differential equations, hyperbolic conservation laws, and fluid mechanics."
+url: "https://youzhouu.github.io"
+baseurl: "/youzhou-math"
+repository: "youzhouu/youzhou-math"
+lang: en
+timezone: Asia/Shanghai
+
+author:
+  name: You Zhou
+  role: Undergraduate student
+  program: Mathematics and Applied Mathematics
+  school: School of Mathematical Sciences
+  university: Shenzhen University
+  email: zhouyou2023@email.szu.edu.cn
+
+# Set to /assets/pdf/cv.pdf after uploading the real CV.
+cv_pdf: ""
+
+navigation:
+  - title: Home
+    url: /
+  - title: Research
+    url: /research/
+  - title: Notes
+    url: /notes/
+  - title: Talks
+    url: /talks/
+  - title: CV
+    url: /cv/
+
+note_categories:
+  - slug: evans-pde
+    title: Evans PDE
+    description: Reading notes on partial differential equations, following Evans.
+  - slug: analysis
+    title: Analysis
+    description: Notes on real analysis and related foundations.
+  - slug: conservation-laws
+    title: Conservation laws
+    description: Notes on hyperbolic conservation laws and related questions.
+  - slug: wave-stability
+    title: Stability of waves
+    description: Notes on waves and their stability in partial differential equations.
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+permalink: pretty
+strict_front_matter: true
+
+collections:
+  notes:
+    output: true
+    permalink: /notes/:name/
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+  - scope:
+      path: ""
+      type: notes
+    values:
+      layout: note
+      order: 100
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - docs
+  - scripts
+  - assets/pdf/README.md
