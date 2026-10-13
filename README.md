@@ -2,13 +2,15 @@
 
 You Zhou 的个人数学学术主页。网站显示内容统一为英文，中文 README 仅供维护，不进入发布网站。使用 Jekyll 4.4、Markdown 和少量 CSS，内容与共用布局分开，没有数据库、JavaScript 框架或前端打包工具。
 
+**公开网站：[You Zhou](https://youzhouu.github.io/youzhou-math/)** · **源码仓库：[youzhouu/youzhou-math](https://github.com/youzhouu/youzhou-math)**
+
 网站只包含已提供的身份、研究兴趣和联系方式，并为讲义与学术资料保留目录。尚未列出论文、报告或奖项，也没有添加讲义 PDF 或 CV 文件，不显示不存在的下载链接。实际发布状态见文末记录；本地预览成功不等于公网发布成功。
 
 ## 日常更新的完整顺序
 
 以后每次更新，按这条顺序操作即可：**启动本地预览 → 修改 Markdown / 上传 PDF → 检查页面 → 构建与检查 → 提交推送 → 查看 Actions → 打开公开网站**。简介只需编辑对应 Markdown；上传讲义一般只涉及 `_notes/` 和 `assets/pdf/`，无需改动布局。
 
-如果采用 GitHub 网页直接编辑，提交后会自动进入 Actions；下一次在本机编辑前，先同步远程变更，避免本机仍使用旧版本。两种编辑方式的具体步骤在后面分别说明。
+小幅更新最方便的方式是在 GitHub 网页直接编辑：提交后会自动进入 Actions，不需要配置本机推送凭据。下一次在本机编辑前，先同步远程变更，避免本机仍使用旧版本。两种编辑方式的具体步骤在后面分别说明。
 
 ## 本地预览
 
@@ -222,7 +224,7 @@ repository: "youzhouu/youzhou-math"
 
 `url` 只写域名与协议、不带末尾 `/`；`baseurl` 写项目子目录，带开头 `/`、不带末尾 `/`；`repository` 写 GitHub 的 `用户名/仓库名`，不写完整 URL。
 
-对应的目标公开地址是 `https://youzhouu.github.io/youzhou-math/`。这是本轮已选定的地址，实际部署成功情况见文末记录。
+公开地址是 [https://youzhouu.github.io/youzhou-math/](https://youzhouu.github.io/youzhou-math/)，首次部署已成功并实际访问验证。部署记录见文末。
 
 | 发布位置 | `url` | `baseurl` | `repository` |
 | --- | --- | --- | --- |
@@ -260,7 +262,7 @@ repository: "youzhou-math/youzhou-math.github.io"
 
 发布需要登录 GitHub、拥有目标仓库的管理权限，并确认使用哪个个人账号或组织。使用 GitHub Free 时，网站源码仓库须设为 **Public**；网站内容会公开访问。[GitHub 创建 Pages 网站说明](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site)
 
-首次发布的步骤如下；若文末已记录仓库和部署结果，不必重新创建仓库：
+本项目首次发布已完成，下面保留从头部署的操作说明，供换账号、迁移项目或新建其他网站参考。日常更新直接使用后面的“发布后的日常操作”，不必重新创建仓库或重新启用 Pages：
 
 1. 确定 GitHub 用户名、仓库名和网址，填写 `_config.yml` 的 `url`、`baseurl`、`repository`。
 2. 登录 GitHub，创建对应的 **Public** 仓库。若准备从这个本地项目推送，创建时不要额外初始化 README、`.gitignore` 或 License，避免与本地已有文件形成两个独立历史。[GitHub 本地项目上传说明](https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/adding-locally-hosted-code-to-github)
@@ -282,6 +284,8 @@ bundle exec jekyll serve --host 127.0.0.1 --baseurl /youzhou-math
 打开 [http://127.0.0.1:4000/youzhou-math/](http://127.0.0.1:4000/youzhou-math/)，检查导航、CSS 与 PDF。手机可在浏览器响应式模式查看；第一版采用窄屏上下排列，无头像、横幅或动画。
 
 ### 本地 Git 首次设置与推送
+
+**当前项目已有提交历史、`origin` 远程地址和项目级 Git 提交身份，不需要再次初始化、添加 `origin` 或重复设置身份。** 当前公开版本通过 GitHub 网页提交完成；本机 HTTPS 推送仍需配置身份验证。下面的首次设置步骤主要供换设备或复制到新环境时使用。
 
 本地仓库初始化、创建提交、连接远程仓库、推送上线是四件不同的事，不要由“已有 `.git/`”推断已完成后三步。先在项目目录检查：
 
@@ -320,7 +324,7 @@ git push -u origin main
 
 已经有 `origin` 时先核对它，地址正确则直接推送，不重复添加。若需要更换地址，使用 `git remote set-url origin ACTUAL-REMOTE-URL`。
 
-本机推送还需要 GitHub 身份验证。可使用 GitHub CLI 的 `gh auth login` 按浏览器流程登录，或使用已配置的 SSH / 凭据管理器；GitHub 网页的登录密码不能直接用作 HTTPS `git push` 的密码。工作流自身的 `GITHUB_TOKEN` 不等于本机推送凭据。[GitHub 身份验证说明](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github)
+本机推送还需要 GitHub 身份验证。当前本机 HTTPS `git push` 测试提示尚未认证，因此若要采用命令行更新，先使用 GitHub CLI 的 `gh auth login` 按浏览器流程登录，或配置 SSH / 凭据管理器。GitHub 网页的登录密码不能直接用作 HTTPS `git push` 的密码；Git 提交姓名和邮箱也不等于推送凭据。工作流自身的 `GITHUB_TOKEN` 不等于本机推送凭据。[GitHub 身份验证说明](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github)
 
 ## 发布后的日常操作
 
@@ -351,7 +355,7 @@ GitHub 的 Markdown Preview 不执行 Jekyll / Liquid，因此它不是最终网
 
 ### 在本机编辑、检查、提交和推送
 
-首次设置与远程连接已经完成后，日常从项目目录开始。若之前在 GitHub 网页改过文件，且本地没有未提交修改，先同步：
+本项目已连接远程仓库，采用本机推送前仍需完成上面的身份验证设置。日常从项目目录开始；若之前在 GitHub 网页改过文件，且本地没有未提交修改，先同步：
 
 ```sh
 git status
@@ -422,7 +426,6 @@ git push origin main
 
 ## 待补充的真实资料
 
-- GitHub Pages 实际部署结果与公开网址访问验证（当前已选 `youzhouu/youzhou-math` 项目站点）。
 - Evans PDE、分析、守恒律、波的稳定性讲义正文与实际 PDF。
 - 完整 CV 与可公开的简历 PDF。
 - 若有真实研究成果或论文，补充准确标题、作者、状态和链接。
@@ -448,6 +451,8 @@ git push origin main
 - 网站名称使用 `You Zhou`；页面正文、导航、姓名区域和讲义模板统一使用英文。
 - 中文 README、维护脚本与模板目录不发布到网站。
 - 已确认使用现有 GitHub 账号 `youzhouu` 的项目站点，集中配置已改为 `youzhouu/youzhou-math`。
-- 目标公开地址：`https://youzhouu.github.io/youzhou-math/`。
+- 公开网站：[https://youzhouu.github.io/youzhou-math/](https://youzhouu.github.io/youzhou-math/)；源码仓库为公开仓库 [youzhouu/youzhou-math](https://github.com/youzhouu/youzhou-math)。
 - `youzhou-math.github.io` 需要同名个人或组织账号；本轮没有修改 GitHub 用户名。
-- 用户已授权公开发布，目前发布操作进行中；尚未在此记录成功的 Pages 部署结果。公开地址是否可访问以实际 Actions `deploy` 成功及网页验证为准。
+- Pages 发布来源已设为 **GitHub Actions**。首次部署对应提交 `79cac3c`，`build` 用时 31 秒、`deploy` 用时 19 秒，整次运行约 59 秒，均成功。[首次成功运行记录](https://github.com/youzhouu/youzhou-math/actions/runs/38395957778)
+- 已在实际浏览器打开公开地址，确认显示全英文主页。后续每次向 `main` 提交修改会触发新的部署，应按本文步骤检查最新 Actions 运行。
+- 首次公开源码通过 GitHub 网页提交；本机已连接 `origin`，项目级 Git 提交身份沿用该 GitHub 提交作者。当前本机 HTTPS 推送尚未认证，使用本机推送前需配置 GitHub CLI 或其他凭据；网页维护可直接使用已登录的 GitHub 账号。
