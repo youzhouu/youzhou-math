@@ -1,0 +1,4 @@
+{% assign pdf_file = site.static_files | where: 'path', include.path | first %}
+{% if include.path and include.path != empty and pdf_file %}
+  <a class="pdf-link" href="{{ include.path | relative_url }}" target="_blank" rel="noopener noreferrer">{{ include.label | default: 'PDF' | escape }}<span class="sr-only"> (opens in a new tab)</span></a>
+{% endif %}
