@@ -20,6 +20,7 @@ NAVIGATION = {
     "Talks": "talks/index.html",
     "CV": "cv/index.html",
 }
+VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
 
 
 @dataclass
@@ -28,6 +29,7 @@ class Reference:
     attrs: dict
     line: int
     in_navigation: bool = False
+    visible: bool = True
     text: list = field(default_factory=list)
 
     @property
@@ -44,37 +46,57 @@ class Page(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.path = path
         self.references = []
+        self.refreshes = []
         self.ids = set()
         self.navigation_depth = 0
         self.open_anchors = []
+        self.visibility_stack = []
         self.source = path.read_text(encoding="utf-8")
         self.feed(self.source)
         self.close()
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
+        hidden = (
+            (self.visibility_stack and self.visibility_stack[-1][1])
+            or tag in {"head", "script", "style", "template"}
+            or "hidden" in attributes
+            or (attributes.get("aria-hidden") or "").lower() == "true"
+            or "sr-only" in (attributes.get("class") or "").split()
+            or bool(re.search(r"(?:display\s*:\s*none|visibility\s*:\s*hidden)\b", attributes.get("style") or "", re.IGNORECASE))
+        )
+        if tag not in VOID_TAGS:
+            self.visibility_stack.append((tag, bool(hidden)))
         if attributes.get("id"):
             self.ids.add(attributes["id"])
         if tag == "nav":
             self.navigation_depth += 1
+        if tag == "meta" and (attributes.get("http-equiv") or "").lower() == "refresh":
+            self.refreshes.append(Reference(tag, attributes, self.getpos()[0]))
         if tag in {"a", "link", "img", "script"}:
-            reference = Reference(tag, attributes, self.getpos()[0], self.navigation_depth > 0)
+            reference = Reference(tag, attributes, self.getpos()[0], self.navigation_depth > 0, not hidden)
             self.references.append(reference)
             if tag == "a":
                 self.open_anchors.append(reference)
 
     def handle_startendtag(self, tag, attrs):
         self.handle_starttag(tag, attrs)
-        if tag in {"a", "nav"}:
+        if tag not in VOID_TAGS:
             self.handle_endtag(tag)
 
     def handle_endtag(self, tag):
+        for index in range(len(self.visibility_stack) - 1, -1, -1):
+            if self.visibility_stack[index][0] == tag:
+                del self.visibility_stack[index:]
+                break
         if tag == "nav":
             self.navigation_depth = max(0, self.navigation_depth - 1)
         elif tag == "a" and self.open_anchors:
             self.open_anchors.pop()
 
     def handle_data(self, data):
+        if self.visibility_stack and self.visibility_stack[-1][1]:
+            return
         for anchor in self.open_anchors:
             anchor.text.append(data)
 
@@ -126,6 +148,55 @@ def resolve_local(reference, page, root, baseurl):
     if target.is_dir() or url_path.endswith("/"):
         target /= "index.html"
     return target, unquote(parts.fragment)
+
+
+def canonical_links(page):
+    return [
+        reference for reference in page.references
+        if reference.tag == "link" and "canonical" in (reference.attrs.get("rel") or "").lower().split()
+    ]
+
+
+def validate_redirect(page, pages, root, baseurl, site_origin):
+    """Validate the narrowly defined local redirects exempt from main navigation."""
+    if len(page.refreshes) != 1:
+        raise ValueError("redirect must have exactly one meta refresh")
+    content = page.refreshes[0].attrs.get("content") or ""
+    match = re.fullmatch(r"\s*0(?:\.0+)?\s*;\s*url\s*=\s*(?:\"([^\"]+)\"|'([^']+)'|([^\s\"']+))\s*", content, re.IGNORECASE)
+    if not match:
+        raise ValueError("redirect meta refresh must be parseable as '0; url=/local/path/'")
+    redirect_url = next(value for value in match.groups() if value is not None)
+    parts = urlsplit(redirect_url)
+    if parts.scheme or parts.netloc or not redirect_url.startswith("/") or redirect_url.startswith("//") or "\\" in redirect_url or parts.query or parts.fragment:
+        raise ValueError("redirect target must be a root-relative local URL without query or fragment")
+    reference = Reference("a", {"href": redirect_url}, page.refreshes[0].line)
+    resolved = resolve_local(reference, page, root, baseurl)
+    target = resolved[0]
+    if target not in pages or not target.is_file():
+        raise ValueError(f"redirect target must be an existing HTML page: {redirect_url!r}")
+    if target == page.path:
+        raise ValueError("redirect must not point to itself")
+    if pages[target].refreshes:
+        raise ValueError("redirect must point directly to a normal page, not another redirect")
+
+    fallback = [
+        reference for reference in page.references
+        if reference.tag == "a" and reference.visible and reference.label
+    ]
+    if len(fallback) != 1 or fallback[0].url != redirect_url:
+        raise ValueError("redirect must have exactly one visible fallback link with the same href as meta refresh")
+    canonicals = canonical_links(page)
+    if len(canonicals) != 1 or not canonicals[0].url:
+        raise ValueError("redirect must have exactly one canonical link")
+    canonical = urlsplit(canonicals[0].url)
+    if canonical.query or canonical.fragment or canonical.path != parts.path:
+        raise ValueError("redirect canonical path must match the meta refresh URL without query or fragment")
+    if canonical.scheme or canonical.netloc:
+        if canonical.scheme.lower() not in {"http", "https"} or (canonical.scheme.lower(), canonical.netloc.lower()) != site_origin:
+            raise ValueError("redirect canonical must use the same site origin as the homepage")
+    elif not canonical.path.startswith("/"):
+        raise ValueError("redirect canonical must be root-relative or use the homepage origin")
+    return target
 
 
 def main():
@@ -196,7 +267,22 @@ def main():
                 if element_id and element_id not in pages[target].ids:
                     error(page, f"missing fragment #{element_id} in {target.relative_to(root)}", reference)
 
+    home_canonicals = canonical_links(pages[root / "index.html"])
+    site_origin = None
+    if len(home_canonicals) == 1 and home_canonicals[0].url:
+        home_url = urlsplit(home_canonicals[0].url)
+        if home_url.scheme and home_url.netloc:
+            site_origin = (home_url.scheme.lower(), home_url.netloc.lower())
+    redirect_count = 0
     for page in pages.values():
+        if page.refreshes:
+            try:
+                validate_redirect(page, pages, root, baseurl, site_origin)
+            except ValueError as exc:
+                error(page, str(exc), page.refreshes[0])
+            else:
+                redirect_count += 1
+                continue
         navigation = [reference for reference in page.references if reference.tag == "a" and reference.in_navigation]
         for label, destination in NAVIGATION.items():
             matches = [reference for reference in navigation if reference.label == label]
@@ -231,14 +317,14 @@ def main():
         if path.is_file() and path.name.lower().startswith("readme"):
             errors.append(f"{relative}: maintenance file must be excluded from the built site")
 
-    print(f"Checked {len(pages)} HTML pages, {local_count} local references, {fragment_count} fragments, and {pdf_count} PDF links.")
+    print(f"Checked {len(pages)} HTML pages ({redirect_count} validated redirects), {local_count} local references, {fragment_count} fragments, and {pdf_count} PDF links.")
     print(f"Baseurl: {baseurl!r}. Skipped {external_count} external or non-file references; no network requests made.")
     if errors:
         for message in errors:
             print(f"ERROR {message}", file=sys.stderr)
         print(f"FAILED: {len(errors)} error(s).", file=sys.stderr)
         return 1
-    print("PASS: navigation, local files, anchors, PDF behavior, and output exclusions are valid.")
+    print("PASS: navigation, redirects, local files, anchors, PDF behavior, and output exclusions are valid.")
     return 0
 
 
