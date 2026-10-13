@@ -1,8 +1,10 @@
-# youzhou-math
+# You Zhou — academic homepage
 
 You Zhou 的个人数学学术主页。网站显示内容统一为英文，中文 README 仅供维护，不进入发布网站。使用 Jekyll 4.4、Markdown 和少量 CSS，内容与共用布局分开，没有数据库、JavaScript 框架或前端打包工具。
 
-**公开网站：[You Zhou](https://youzhouu.github.io/youzhou-math/)** · **源码仓库：[youzhouu/youzhou-math](https://github.com/youzhouu/youzhou-math)**
+**根站地址：[You Zhou](https://youzhouu.github.io/)** · **源码仓库：[youzhouu/youzhouu.github.io](https://github.com/youzhouu/youzhouu.github.io)**
+
+已从原项目站迁移到上述个人根站并完成公开访问验证，部署记录见文末。本地文件夹继续使用 `youzhou-math`，无需随 GitHub 仓库改名。
 
 网站只包含已提供的身份、研究兴趣和联系方式，并为讲义与学术资料保留目录。尚未列出论文、报告或奖项，也没有添加讲义 PDF 或 CV 文件，不显示不存在的下载链接。实际发布状态见文末记录；本地预览成功不等于公网发布成功。
 
@@ -64,7 +66,7 @@ bundle exec jekyll build --trace
 python3 scripts/check_site.py _site
 ```
 
-检查脚本会从首页样式表路径识别 `baseurl`，也可以用 `--baseurl /youzhou-math` 明确指定。GitHub Actions 在上传网站前也会执行此检查；错误会中止部署。
+检查脚本会从首页样式表路径识别 `baseurl`，当前根站也可以用 `--baseurl ""` 明确指定。GitHub Actions 在上传网站前也会执行此检查；错误会中止部署。
 
 ## 文件与日常维护
 
@@ -79,6 +81,7 @@ python3 scripts/check_site.py _site
 | `cv.md` | CV 页面中的教育经历与简历说明 |
 | `assets/pdf/` | 真实 PDF 文件 |
 | `_layouts/`、`_includes/` | 共用页面结构、姓名区域、导航、页脚与 PDF 链接 |
+| `_layouts/redirect.html`、`legacy/` | 原项目站五个页面地址的静态跳转 |
 | `assets/css/` | 网站样式 |
 | `docs/templates/note.md` | 新讲义模板，不发布到网站 |
 | `.github/workflows/pages.yml` | GitHub Actions 构建与 Pages 发布流程 |
@@ -88,12 +91,13 @@ python3 scripts/check_site.py _site
 
 | 想更新的内容 | 编辑位置 | 具体操作 |
 | --- | --- | --- |
-| Home 的英文个人介绍 | `index.md` | 修改 front matter 下的英文段落，保存后查看 Home |
+| Home 的英文个人介绍 | `index.md` | 修改 front matter 下的英文段落，保留专业与邮箱的 Liquid 表达式，保存后查看 Home |
+| 侧栏、Home 与 CV 的专业名称 | `_config.yml` 的 `author.program` | 只改这一项即可同时更新三处；`description` 中的搜索简介仍需手工同步 |
 | 研究兴趣与论文 | `research.md` | 修改 `Interests` 下的列表；有真实论文后更新 `Publications` |
 | 讲义 | `_notes/` | 新建或编辑讲义 Markdown，目录会自动更新 |
 | Notes 分类名称与说明 | `_config.yml` 的 `note_categories` | 使用英文 `title` 与 `description`，修改后重启预览 |
 | 报告记录 | `talks.md` | 删除空状态说明，再写真实报告的英文题目、日期、场合与资料 |
-| CV 网页正文 | `cv.md` | 更新已确认的教育或其他简历信息，下载文件另按下文配置 |
+| CV 网页正文 | `cv.md` | 更新已确认的教育或其他简历信息，保留专业的 Liquid 表达式；下载文件另按下文配置 |
 
 `notes.md` 主要负责自动生成目录。正常添加讲义时不需要编辑其中的 Liquid 循环。
 
@@ -112,7 +116,9 @@ author:
   email: zhouyou2023@email.szu.edu.cn
 ```
 
-`title` 控制浏览器标题中的网站名称；`author` 控制侧栏信息。只改 `author` 不会自动改写 Home 正文，因此身份变化时也检查 `index.md` 与 `cv.md`。`description` 是英文网站简介，身份或研究方向变化时一并更新。
+`title` 控制浏览器标题中的网站名称；`author` 控制侧栏信息。Home 与 CV 的专业名称通过 Liquid 读取 `site.author.program`，Home 的联系邮箱读取 `site.author.email`，因此这些内容会随配置自动更新。姓名、大学、学院、身份等其他正文仍需按实际情况检查 `index.md` 与 `cv.md`。
+
+专业统一使用全称 **Mathematics and Applied Mathematics**。以后修改专业只需修改 `_config.yml` 的 `author.program`，即可同时更新侧栏、Home 和 CV；保留正文中的 `{{ site.author.program | escape }}`，不要把它替换为手工输入的专业名。`description` 是搜索引擎使用的英文网站简介，其中的专业、身份或研究方向仍需手工同步。修改配置后重启本地预览。侧栏全称的一行排版由 CSS 处理，不要为了排版将专业名缩短为 `Applied Mathematics`。
 
 页面顶部的两条 `---` 之间是 front matter，保存标题、布局等设置。日常编辑正文时保留这部分。例如修改 `title` 会改变页面标题，正文从第二条 `---` 后开始。
 
@@ -214,25 +220,25 @@ An English description of the actual talk.
 
 ## 修改网站地址与仓库名
 
-这些设置只需在 `_config.yml` 中集中修改。当前选择使用 GitHub 账号 `youzhouu` 的项目站点，配置为：
+这些设置只需在 `_config.yml` 中集中修改。当前使用 GitHub 账号 `youzhouu` 的个人根站，配置为：
 
 ```yaml
 url: "https://youzhouu.github.io"
-baseurl: "/youzhou-math"
-repository: "youzhouu/youzhou-math"
+baseurl: ""
+repository: "youzhouu/youzhouu.github.io"
 ```
 
 `url` 只写域名与协议、不带末尾 `/`；`baseurl` 写项目子目录，带开头 `/`、不带末尾 `/`；`repository` 写 GitHub 的 `用户名/仓库名`，不写完整 URL。
 
-公开地址是 [https://youzhouu.github.io/youzhou-math/](https://youzhouu.github.io/youzhou-math/)，首次部署已成功并实际访问验证。部署记录见文末。
+根站地址是 [https://youzhouu.github.io/](https://youzhouu.github.io/)，已部署成功，日常发布不再使用项目目录前缀。根站部署与验证记录见文末；早期项目站的首次成功记录仅作为历史保留。
 
 | 发布位置 | `url` | `baseurl` | `repository` |
 | --- | --- | --- | --- |
-| 项目仓库 `youzhou-math` | `https://USERNAME.github.io` | `/youzhou-math` | `USERNAME/youzhou-math` |
+| 项目仓库 `PROJECT-NAME` | `https://USERNAME.github.io` | `/PROJECT-NAME` | `USERNAME/PROJECT-NAME` |
 | 用户主页仓库 `USERNAME.github.io` | `https://USERNAME.github.io` | `""` | `USERNAME/USERNAME.github.io` |
 | 自定义域名 | `https://example.org` | `""` | 真实的 `用户名/仓库名` |
 
-表中的 `USERNAME` 与 `example.org` 都是说明用占位内容，正式发布前替换为真实值。模板中的站内资源与导航使用 `relative_url`，因此修改 `baseurl` 后不必逐个替换链接。自己在 Markdown 中添加站内页面链接时也采用：
+表中的 `USERNAME`、`PROJECT-NAME` 与 `example.org` 都是说明用占位内容，迁移到其他账号时替换为真实值。当前项目使用上面的 `youzhouu/youzhouu.github.io` 配置。模板中的站内资源与导航使用 `relative_url`，因此修改 `baseurl` 后不必逐个替换链接。自己在 Markdown 中添加站内页面链接时也采用：
 
 ```liquid
 [Research]({{ '/research/' | relative_url }})
@@ -252,9 +258,33 @@ baseurl: ""
 repository: "youzhou-math/youzhou-math.github.io"
 ```
 
-当前文件夹仍可保留 `youzhou-math`，文件夹名不决定域名。本轮使用现有账号 `youzhouu`，因此选择项目地址 `https://youzhouu.github.io/youzhou-math/`。`github.io` 子域由 GitHub 分配，不能作为独立自定义域名任意申请；独立域名需另外购买并设置 DNS。
+当前文件夹仍可保留 `youzhou-math`，文件夹名不决定域名。本项目使用现有账号 `youzhouu` 的根站地址 `https://youzhouu.github.io/`，对应仓库名 `youzhouu.github.io`。`github.io` 子域由 GitHub 分配，不能作为独立自定义域名任意申请；独立域名需另外购买并设置 DNS。
 
 是否能注册 `youzhou-math` 账号或组织名，需要 GitHub 实际注册或创建时确认；本 README 不将它标为已取得的域名，也不将它标为已上线地址。
+
+### 根站迁移与旧地址
+
+本次沿用原仓库及其 Git 历史，将仓库改名为 `youzhouu.github.io`，不创建第二套网站。现有 `.github/workflows/pages.yml` 继续使用，Pages 发布来源仍为 GitHub Actions。主要变化是仓库名、远程地址和空 `baseurl`；讲义 / PDF 的维护方法不变。
+
+新的 `origin` HTTPS 地址应为：
+
+```text
+https://github.com/youzhouu/youzhouu.github.io.git
+```
+
+执行 `git remote -v` 核对现有地址。换设备或旧副本需要更新时，用 `git remote set-url origin https://github.com/youzhouu/youzhouu.github.io.git`，不重复执行 `remote add`。仓库地址重定向与网页地址跳转是两回事，不要只改 Git 远程地址而保留旧的 `baseurl`。
+
+`legacy/` 中的五个静态 Markdown 页面配合 `_layouts/redirect.html`，在根站部署后为以下历史网页地址提供对应跳转：
+
+| 原项目站地址 | 新根站地址 |
+| --- | --- |
+| `/youzhou-math/` | `/` |
+| `/youzhou-math/research/` | `/research/` |
+| `/youzhou-math/notes/` | `/notes/` |
+| `/youzhou-math/talks/` | `/talks/` |
+| `/youzhou-math/cv/` | `/cv/` |
+
+这些是静态网页跳转，并提供可点击的新地址。日常内容继续编辑原来的五个主页面，不要把正文写进 `legacy/`；保留旧页面的 `permalink`，才能照顾原有书签与分享链接。新增内容使用根站地址。
 
 ## 首次公开发布
 
@@ -275,13 +305,13 @@ repository: "youzhou-math/youzhou-math.github.io"
 
 生产构建直接读取 `_config.yml` 的 `url` 和 `baseurl`，工作流不会覆盖它们。上传前务必确认这些值对应实际 Pages 地址，否则项目子目录中的 CSS、导航或 PDF 路径可能不正确。自定义域名的 DNS 与 Pages 域名设置留到选定域名后处理。
 
-发布前可模拟项目子目录预览：
+当前根站直接按空 `baseurl` 预览：
 
 ```sh
-bundle exec jekyll serve --host 127.0.0.1 --baseurl /youzhou-math
+bundle exec jekyll serve --host 127.0.0.1 --baseurl ""
 ```
 
-打开 [http://127.0.0.1:4000/youzhou-math/](http://127.0.0.1:4000/youzhou-math/)，检查导航、CSS 与 PDF。手机可在浏览器响应式模式查看；第一版采用窄屏上下排列，无头像、横幅或动画。
+打开 [http://127.0.0.1:4000/](http://127.0.0.1:4000/)，检查导航、CSS 与 PDF；另打开 `http://127.0.0.1:4000/youzhou-math/` 及四个旧导航地址，确认静态跳转到正确的新页面。手机可在浏览器响应式模式查看，窄屏采用上下排列，无头像、横幅或动画。
 
 ### 本地 Git 首次设置与推送
 
@@ -446,13 +476,23 @@ git push origin main
 
 第一版时，本地 Git 已初始化为 `main` 分支；当时未设置 Git 提交姓名和邮箱，尚未创建提交或连接远程仓库。
 
-## 全英文修改与发布记录（2026-10-13）
+## 历史：全英文修改与首次项目站发布（2026-10-13）
 
 - 网站名称使用 `You Zhou`；页面正文、导航、姓名区域和讲义模板统一使用英文。
 - 中文 README、维护脚本与模板目录不发布到网站。
-- 已确认使用现有 GitHub 账号 `youzhouu` 的项目站点，集中配置已改为 `youzhouu/youzhou-math`。
-- 公开网站：[https://youzhouu.github.io/youzhou-math/](https://youzhouu.github.io/youzhou-math/)；源码仓库为公开仓库 [youzhouu/youzhou-math](https://github.com/youzhouu/youzhou-math)。
-- `youzhou-math.github.io` 需要同名个人或组织账号；本轮没有修改 GitHub 用户名。
-- Pages 发布来源已设为 **GitHub Actions**。首次部署对应提交 `79cac3c`，`build` 用时 31 秒、`deploy` 用时 19 秒，整次运行约 59 秒，均成功。[首次成功运行记录](https://github.com/youzhouu/youzhou-math/actions/runs/38395957778)
-- 已在实际浏览器打开公开地址，确认显示全英文主页。后续每次向 `main` 提交修改会触发新的部署，应按本文步骤检查最新 Actions 运行。
-- 首次公开源码通过 GitHub 网页提交；本机已连接 `origin`，项目级 Git 提交身份沿用该 GitHub 提交作者。当前本机 HTTPS 推送尚未认证，使用本机推送前需配置 GitHub CLI 或其他凭据；网页维护可直接使用已登录的 GitHub 账号。
+- 当时使用现有 GitHub 账号 `youzhouu` 的项目站点，配置为 `youzhouu/youzhou-math`。
+- 当时的公开网址为 `https://youzhouu.github.io/youzhou-math/`，公开仓库名为 `youzhouu/youzhou-math`。这些是首次部署的历史地址，现已迁移到下文的个人根站。
+- `youzhou-math.github.io` 需要同名个人或组织账号；没有修改 GitHub 用户名。
+- Pages 发布来源设为 **GitHub Actions**。首次部署对应提交 `79cac3c`，`build` 用时 31 秒、`deploy` 用时 19 秒，整次运行约 59 秒，均成功。[首次成功运行记录](https://github.com/youzhouu/youzhouu.github.io/actions/runs/38395957778)
+- 当时已在实际浏览器打开项目站公开地址，确认显示全英文主页。
+- 首次公开源码通过 GitHub 网页提交；本机连接 `origin`，项目级 Git 提交身份沿用该 GitHub 提交作者。当时本机 HTTPS 推送尚未认证。
+
+## 根站迁移与专业名称更新（2026-10-13）
+
+- 已公开的根站：[https://youzhouu.github.io/](https://youzhouu.github.io/)；仓库：[youzhouu/youzhouu.github.io](https://github.com/youzhouu/youzhouu.github.io)。只改仓库名，保留 GitHub 用户名 `youzhouu`、**Public** 可见性、完整 Git 历史与现有 Actions 工作流。本地 `origin` 已更新为新仓库地址。
+- `_config.yml` 使用 `url: "https://youzhouu.github.io"`、`baseurl: ""`、`repository: "youzhouu/youzhouu.github.io"`。
+- 根站部署对应提交 `83837b9`，`build` 用时 13 秒、`deploy` 用时 2 分 20 秒，整次运行约 4 分 49 秒（含队列等待），均成功。[根站成功部署记录](https://github.com/youzhouu/youzhouu.github.io/actions/runs/38402333901)
+- 专业名称统一为 **Mathematics and Applied Mathematics**，侧栏保留完整名称并以一行显示。Home 与 CV 动态读取 `author.program`，三处专业同步，`description` 的 SEO 简介也已使用完整名称。
+- 实际浏览器已分别访问公开根站的 Home、Research、Notes、Talks、CV，确认专业与导航路径正确；五个旧 `/youzhou-math/` 页面地址均逐一验证，跳转到对应的新根站页面。
+- 公开桌面 1280 像素视口下，310 像素侧栏中的专业名一行显示，无横向溢出；公开手机检查使用工具实际提供的 494 像素视口，呈单栏且无横向溢出。本地另已验证 320 像素窄屏下专业名一行显示且无横向溢出。
+- 在独立的 `origin/main` 源码副本中完成生产构建与检查：11 个 HTML 页面（含 5 个旧地址跳转页）、66 条站内引用与 10 个锚点检查通过。
