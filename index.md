@@ -4,7 +4,7 @@ title: Home
 permalink: /
 ---
 
-I am **You Zhou**, an undergraduate student in Mathematics and Applied Mathematics at the School of Mathematical Sciences, Shenzhen University.
+I am **You Zhou**, an undergraduate student in {{ site.author.program | escape }} at the School of Mathematical Sciences, Shenzhen University.
 
 My interests lie in **partial differential equations**, particularly **hyperbolic conservation laws** and **mathematical problems in fluid mechanics**.
 

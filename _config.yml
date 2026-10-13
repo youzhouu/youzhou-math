@@ -1,16 +1,16 @@
-# GitHub Pages project site. Change these fields together if the site moves.
+# GitHub Pages user site. Change these fields together if the site moves.
 title: "You Zhou"
-description: "You Zhou — undergraduate in Applied Mathematics at Shenzhen University. Interests in partial differential equations, hyperbolic conservation laws, and fluid mechanics."
+description: "You Zhou — undergraduate in Mathematics and Applied Mathematics at Shenzhen University. Interests in partial differential equations, hyperbolic conservation laws, and fluid mechanics."
 url: "https://youzhouu.github.io"
-baseurl: "/youzhou-math"
-repository: "youzhouu/youzhou-math"
+baseurl: ""
+repository: "youzhouu/youzhouu.github.io"
 lang: en
 timezone: Asia/Shanghai
 
 author:
   name: You Zhou
   role: Undergraduate student
-  program: Applied Mathematics
+  program: Mathematics and Applied Mathematics
   school: School of Mathematical Sciences
   university: Shenzhen University
   email: zhouyou2023@email.szu.edu.cn
