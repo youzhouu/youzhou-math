@@ -6,7 +6,7 @@ permalink: /cv/
 
 ## Education
 
-**Currently - Shenzhen University**  
+**Currently, Shenzhen University**  
 School of Mathematical Sciences  
 Undergraduate student in {{ site.author.program | escape }}
 
