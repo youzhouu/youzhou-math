@@ -31,15 +31,16 @@ main > h2:first-of-type { margin-top: 0; }
 
 .site-wrapper {
   display: grid;
-  grid-template-columns: 250px minmax(0, 650px);
-  gap: 64px;
-  max-width: 1060px;
+  grid-template-columns: 310px minmax(0, 650px);
+  gap: 56px;
+  max-width: 1112px;
   margin: 0 auto;
   padding: 72px 48px 40px;
 }
 .profile { padding-top: 1px; font-size: 0.9rem; line-height: 1.6; }
 .profile-name { display: inline-block; margin-bottom: 1.5rem; color: #252b33; font-size: 2rem; line-height: 1.2; text-decoration: none; }
 .affiliation { margin-bottom: 1rem; }
+.profile-program { display: inline-block; white-space: nowrap; }
 .contact { margin-top: 1.7rem; font-size: 0.82rem; }
 .contact-label { display: block; color: var(--muted); font-size: 0.78rem; }
 .contact a { overflow-wrap: anywhere; }
@@ -96,6 +97,7 @@ th, td { border-bottom: 1px solid var(--rule); padding: 0.5rem; text-align: left
   .profile { margin-bottom: 2rem; }
   .profile-name { font-size: 1.8rem; }
   .affiliation { margin-bottom: 0.6rem; }
+  .profile-program { white-space: normal; }
   .contact { margin-top: 0.9rem; margin-bottom: 0; }
   .site-nav { column-gap: 1.3rem; margin-bottom: 1.7rem; }
   h1 { font-size: 1.7rem; }
