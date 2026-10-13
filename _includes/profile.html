@@ -1,0 +1,15 @@
+<header class="profile" aria-label="Profile and contact information">
+  <a class="profile-name" href="{{ '/' | relative_url }}">{{ site.author.name | escape }}</a>
+  <p class="affiliation">
+    {{ site.author.role | escape }}<br>
+    {{ site.author.program | escape }}
+  </p>
+  <p class="affiliation">
+    {{ site.author.school | escape }}<br>
+    {{ site.author.university | escape }}
+  </p>
+  <p class="contact">
+    <span class="contact-label">Email</span>
+    <a href="mailto:{{ site.author.email | escape }}">{{ site.author.email | escape }}</a>
+  </p>
+</header>
