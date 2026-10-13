@@ -2,7 +2,7 @@
   <a class="profile-name" href="{{ '/' | relative_url }}">{{ site.author.name | escape }}</a>
   <p class="affiliation">
     {{ site.author.role | escape }}<br>
-    {{ site.author.program | escape }}
+    <span class="profile-program">{{ site.author.program | escape }}</span>
   </p>
   <p class="affiliation">
     {{ site.author.school | escape }}<br>
