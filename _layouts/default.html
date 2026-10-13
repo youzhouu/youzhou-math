@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="{{ page.lang | default: site.lang | escape }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if page.title and page.title != 'Home' %}{{ page.title | escape }} · {% endif %}{{ site.title | escape }}</title>
+    <meta name="description" content="{{ page.description | default: site.description | escape }}">
+    {% if site.url != empty %}<link rel="canonical" href="{{ page.url | absolute_url }}">{% endif %}
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="site-wrapper">
+      {% include profile.html %}
+      <div class="main-column">
+        {% include navigation.html %}
+        <main id="main-content" tabindex="-1">
+          <h1>{{ page.title | escape }}</h1>
+          {{ content }}
+        </main>
+        {% include footer.html %}
+      </div>
+    </div>
+  </body>
+</html>
